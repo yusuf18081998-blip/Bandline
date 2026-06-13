@@ -109,6 +109,7 @@
     transition:border-color .15s ease;background:none;cursor:pointer;font-family:'Inter',sans-serif;
   }
   .btn-secondary:hover{border-color:var(--ink);}
+  .btn-secondary:disabled{opacity:0.5;cursor:not-allowed;}
   .fine-print{font-size:13px;color:#7C857E;margin-top:14px;}
 
   /* BAND SCALE */
@@ -328,6 +329,47 @@
     background:#FBEEEB;border:1px solid #E8C4BB;border-radius:10px;padding:14px;
     color:var(--danger);font-size:14px;margin-top:14px;
   }
+
+  /* SPEAKING — VOICE SESSION ORB */
+  .orb-wrap{
+    display:flex;flex-direction:column;align-items:center;padding:48px 0 12px;text-align:center;
+  }
+  #orbCanvas{width:300px;height:300px;max-width:80vw;max-height:80vw;}
+  .orb-status{
+    font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:600;
+    letter-spacing:0.1em;text-transform:uppercase;color:var(--sage);margin-top:8px;
+  }
+  .orb-caption{
+    font-size:16px;color:#3A453F;margin-top:14px;max-width:560px;min-height:48px;
+    line-height:1.6;padding:0 16px;
+  }
+  .session-controls{
+    display:flex;gap:12px;justify-content:center;margin-top:28px;flex-wrap:wrap;padding-bottom:28px;
+  }
+  .btn-end{
+    background:var(--danger);color:#fff;border:none;padding:14px 26px;border-radius:100px;
+    font-weight:600;font-size:15px;cursor:pointer;transition:transform .15s ease;
+    font-family:'Inter',sans-serif;
+  }
+  .btn-end:hover{transform:translateY(-2px);}
+  .subtitles-box{
+    max-width:640px;margin:0 auto 40px;background:var(--card);border:1px solid var(--line);
+    border-radius:16px;padding:20px;max-height:320px;overflow-y:auto;
+    display:flex;flex-direction:column;gap:12px;
+  }
+
+  /* CHAT bubbles (used in subtitles) */
+  .chat-bubble{
+    padding:12px 16px;border-radius:14px;font-size:14.5px;line-height:1.6;max-width:90%;
+  }
+  .chat-bubble.examiner{
+    background:var(--paper);border:1px solid var(--line);align-self:flex-start;
+  }
+  .chat-bubble.examiner .who{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--sage);font-weight:600;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;display:block;}
+  .chat-bubble.user{
+    background:var(--ink);color:var(--paper);align-self:flex-end;
+  }
+  .chat-bubble.user .who{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--gold);font-weight:600;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;display:block;}
 </style>
 </head>
 <body>
@@ -406,9 +448,9 @@
         <p>Task 1 va Task 2 insholaringizni yuklang — AI har bir mezon (TR, CC, LR, GRA) bo‘yicha band va aniq tavsiyalar beradi.</p>
       </div>
       <div class="card">
-        <div class="num">02 <span class="status soon">Tez kunda</span></div>
+        <div class="num">02 <span class="status ready">Ishlaydi</span></div>
         <h3>Speaking simulyatori</h3>
-        <p>Ovozli javoblaringizni yozib oling. AI talaffuz, ravonlik va lug‘at boyligi bo‘yicha darhol fikr bildiradi.</p>
+        <p>AI imtihonchi bilan ovozli suhbat — savol beradi, siz gapirasiz, u tinglaydi va keyingi savolni beradi.</p>
       </div>
       <div class="card">
         <div class="num">03 <span class="status soon">Tez kunda</span></div>
@@ -510,10 +552,10 @@
       <h3>Writing baholovchi</h3>
       <p>Insho yuboring va AI mezon bo‘yicha (TR, CC, LR, GRA) band va tavsiyalar beradi.</p>
     </div>
-    <div class="card">
-      <div class="num">02 <span class="status soon">Tez kunda</span></div>
+    <div class="card clickable" onclick="showView('speaking')">
+      <div class="num">02 <span class="status ready">Ishlaydi</span></div>
       <h3>Speaking simulyatori</h3>
-      <p>Ovozli javob yozib olish va AI tahlili.</p>
+      <p>AI imtihonchi bilan ovozli suhbat.</p>
     </div>
     <div class="card">
       <div class="num">03 <span class="status soon">Tez kunda</span></div>
@@ -570,6 +612,53 @@
 </main>
 </div>
 
+<!-- ===================== SPEAKING TOOL (voice session) ===================== -->
+<div class="view" id="view-speaking">
+<main class="wrap">
+  <section class="tool-head">
+    <button class="back-btn" onclick="showView('dashboard')">←</button>
+    <h2>Speaking simulyatori — AI imtihonchi</h2>
+  </section>
+
+  <!-- intro -->
+  <section id="speakingIntro" style="padding:0 0 24px">
+    <div class="tool-panel">
+      <h4>Qanday ishlaydi</h4>
+      <p style="font-size:14.5px;color:#5C665F;line-height:1.7;margin-bottom:16px">
+        AI imtihonchi savol beradi va uni ovoz orqali aytadi. Javob berish vaqtingiz kelganda
+        mikrofoningizga gapiring, so'ng "Javobni yuborish" tugmasini bosing. Suhbat Part 1 → Part 2 → Part 3
+        ketma-ketligida davom etadi, oxirida umumiy baho beriladi (talaffuzsiz).
+      </p>
+      <button class="btn-primary" style="width:100%;text-align:center" onclick="startInterview()">Suhbatni boshlash</button>
+      <p class="fine-print" id="micNote" style="margin-top:12px"></p>
+    </div>
+  </section>
+
+  <!-- live voice session -->
+  <section id="speakingSession" style="display:none;padding-bottom:8px">
+    <div class="orb-wrap">
+      <canvas id="orbCanvas" width="320" height="320"></canvas>
+      <div class="orb-status" id="orbStatus">Tayyorlanmoqda...</div>
+      <div class="orb-caption" id="orbCaption"></div>
+    </div>
+    <div class="session-controls">
+      <button class="btn-primary" id="finishAnswerBtn" onclick="stopListeningAndSubmit()" style="display:none">Javobni yuborish</button>
+      <button class="btn-secondary" onclick="toggleSubtitles()">Subtitlar</button>
+      <button class="btn-end" onclick="endSession()">✕ Sessiyani tugatish</button>
+    </div>
+    <div class="subtitles-box" id="subtitlesBox" style="display:none"></div>
+  </section>
+
+  <!-- results -->
+  <section id="speakingResultSection" style="display:none;padding-bottom:80px">
+    <div class="tool-panel">
+      <h4>Yakuniy baho</h4>
+      <div id="speechResultArea"></div>
+    </div>
+  </section>
+</main>
+</div>
+
 <!-- ===================== FOOTER (always visible on landing) ===================== -->
 <div class="view active" id="view-footer">
 <footer>
@@ -584,25 +673,32 @@
 </div>
 
 <script>
-  let isLoginMode = false;
-  let currentTask = 1;
-  let userName = '';
-
+  /* =========================================================
+     NAVIGATION
+  ========================================================= */
   function showView(name){
     document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
     document.getElementById('view-' + name).classList.add('active');
     document.getElementById('view-footer').classList.toggle('active', name === 'landing');
     window.scrollTo({top:0, behavior:'smooth'});
 
-    // nav state
     const navCta = document.getElementById('navCta');
     const navDash = document.getElementById('navDashBtn');
-    if(name === 'dashboard' || name === 'writing'){
+    if(name === 'dashboard' || name === 'writing' || name === 'speaking'){
       navCta.textContent = 'Chiqish';
       navCta.onclick = () => { showView('landing'); navDash.style.display='none'; navCta.textContent='Bepul boshlash'; navCta.onclick=()=>showView('signup'); };
       navDash.style.display = 'inline-block';
     }
+    if(name !== 'speaking'){
+      cleanupSession();
+    }
   }
+
+  /* =========================================================
+     AUTH
+  ========================================================= */
+  let isLoginMode = false;
+  let userName = '';
 
   function toggleAuthMode(){
     isLoginMode = !isLoginMode;
@@ -623,9 +719,14 @@
     showView('dashboard');
   }
 
+  /* =========================================================
+     WRITING TOOL
+  ========================================================= */
+  let currentTask = 1;
+
   function setTask(n, e){
     currentTask = n;
-    document.querySelectorAll('.seg button').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('#view-writing .seg button').forEach(b => b.classList.remove('active'));
     e.target.classList.add('active');
   }
 
@@ -635,6 +736,22 @@
       document.getElementById('wordCount').textContent = words + ' so‘z';
     }
   });
+
+  async function callClaude(prompt, maxTokens){
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-6",
+        max_tokens: maxTokens || 1000,
+        messages: [{ role: "user", content: prompt }]
+      })
+    });
+    const data = await response.json();
+    if(!data.content){ throw new Error(JSON.stringify(data).slice(0,200)); }
+    const textBlock = data.content.find(c => c.type === 'text');
+    return textBlock.text.trim();
+  }
 
   async function evaluateEssay(){
     const essay = document.getElementById('essayInput').value.trim();
@@ -670,19 +787,7 @@ Javobni FAQAT quyidagi JSON formatida qaytaring, hech qanday qo'shimcha matn, iz
 }`;
 
     try{
-      const response = await fetch("https://api.anthropic.com/v1/messages", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          model: "claude-sonnet-4-6",
-          max_tokens: 1000,
-          messages: [{ role: "user", content: prompt }]
-        })
-      });
-
-      const data = await response.json();
-      const textBlock = data.content.find(c => c.type === 'text');
-      let raw = textBlock.text.trim();
+      let raw = await callClaude(prompt, 1000);
       raw = raw.replace(/```json|```/g, '').trim();
       const result = JSON.parse(raw);
 
@@ -712,6 +817,348 @@ Javobni FAQAT quyidagi JSON formatida qaytaring, hech qanday qo'shimcha matn, iz
     }
   }
 
+  /* =========================================================
+     SPEAKING — VOICE SESSION WITH AI EXAMINER
+  ========================================================= */
+  let interviewHistory = [];
+  let interviewStage = 'part1';
+  let interviewTurns = 0;
+  let sessionState = 'idle'; // idle | thinking | speaking | listening
+  let recognition = null;
+  let finalTranscript = '';
+  let manualStop = false;
+
+  let audioCtx, analyser, micStream, micDataArray;
+  let orbParticles = [];
+  let orbAnimId = null;
+
+  function setStatus(text){
+    document.getElementById('orbStatus').textContent = text;
+  }
+
+  function appendSubtitle(role, text){
+    const box = document.getElementById('subtitlesBox');
+    const div = document.createElement('div');
+    div.className = 'chat-bubble ' + (role === 'examiner' ? 'examiner' : 'user');
+    div.innerHTML = `<span class="who">${role === 'examiner' ? 'Imtihonchi' : 'Siz'}</span>${text}`;
+    box.appendChild(div);
+    box.scrollTop = box.scrollHeight;
+  }
+
+  function toggleSubtitles(){
+    const box = document.getElementById('subtitlesBox');
+    box.style.display = box.style.display === 'none' ? 'flex' : 'none';
+  }
+
+  /* ---- mic analyser for orb reactivity ---- */
+  async function setupMic(){
+    try{
+      micStream = await navigator.mediaDevices.getUserMedia({audio:true});
+      audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+      const source = audioCtx.createMediaStreamSource(micStream);
+      analyser = audioCtx.createAnalyser();
+      analyser.fftSize = 256;
+      source.connect(analyser);
+      micDataArray = new Uint8Array(analyser.frequencyBinCount);
+      document.getElementById('micNote').textContent = '';
+    }catch(e){
+      document.getElementById('micNote').textContent = 'Mikrofonga ruxsat berilmadi — animatsiya soddalashtirilgan rejimda ishlaydi.';
+    }
+  }
+
+  function getMicLevel(){
+    if(!analyser) return 0.18 + 0.05*Math.sin(Date.now()*0.005);
+    analyser.getByteTimeDomainData(micDataArray);
+    let sum = 0;
+    for(let i=0;i<micDataArray.length;i++){
+      const v = (micDataArray[i]-128)/128;
+      sum += v*v;
+    }
+    const rms = Math.sqrt(sum/micDataArray.length);
+    return Math.min(1, rms*5);
+  }
+
+  /* ---- orb canvas animation ---- */
+  function initOrb(){
+    const canvas = document.getElementById('orbCanvas');
+    const N = 700;
+    orbParticles = [];
+    for(let i=0;i<N;i++){
+      orbParticles.push({
+        angle: Math.random()*Math.PI*2,
+        radiusFrac: Math.sqrt(Math.random()),
+        seed: Math.random()*1000,
+        size: Math.random()*1.6+0.4
+      });
+    }
+    if(orbAnimId) cancelAnimationFrame(orbAnimId);
+    animateOrb();
+  }
+
+  function animateOrb(){
+    const canvas = document.getElementById('orbCanvas');
+    const ctx = canvas.getContext('2d');
+    const cx = canvas.width/2, cy = canvas.height/2;
+    const maxR = canvas.width/2 - 8;
+    const c1 = [79,124,107];
+    const c2 = [217,162,59];
+
+    function frame(t){
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      let level;
+      if(sessionState === 'listening') level = getMicLevel();
+      else if(sessionState === 'speaking') level = 0.4 + 0.3*Math.sin(t*0.006);
+      else if(sessionState === 'thinking') level = 0.22 + 0.08*Math.sin(t*0.008);
+      else level = 0.15 + 0.05*Math.sin(t*0.003);
+
+      orbParticles.forEach(p => {
+        const jitter = Math.sin(t*0.0018 + p.seed)*0.06;
+        const r = maxR * p.radiusFrac * (0.5 + 0.5*level + jitter);
+        const x = cx + Math.cos(p.angle)*r;
+        const y = cy + Math.sin(p.angle)*r;
+        const frac = p.radiusFrac;
+        const col = c1.map((c,i)=>Math.round(c+(c2[i]-c)*frac));
+        ctx.fillStyle = `rgba(${col[0]},${col[1]},${col[2]},${0.3+0.45*level})`;
+        ctx.beginPath();
+        ctx.arc(x,y,p.size,0,Math.PI*2);
+        ctx.fill();
+      });
+
+      orbAnimId = requestAnimationFrame(frame);
+    }
+    orbAnimId = requestAnimationFrame(frame);
+  }
+
+  /* ---- text to speech for examiner ---- */
+  function speakText(text, onEnd){
+    if(!window.speechSynthesis){ onEnd && onEnd(); return; }
+    speechSynthesis.cancel();
+    const utter = new SpeechSynthesisUtterance(text);
+    utter.lang = 'en-US';
+    utter.rate = 1;
+    utter.onend = () => onEnd && onEnd();
+    utter.onerror = () => onEnd && onEnd();
+    speechSynthesis.speak(utter);
+  }
+
+  /* ---- speech recognition for candidate ---- */
+  function startListening(){
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if(!SR){
+      setStatus('Brauzer ovozni qo\'llab-quvvatlamaydi');
+      document.getElementById('orbCaption').textContent = 'Iltimos, Chrome brauzerdan foydalaning yoki javobni qo\'lda kiriting.';
+      return;
+    }
+    finalTranscript = '';
+    manualStop = false;
+    recognition = new SR();
+    recognition.lang = 'en-US';
+    recognition.continuous = true;
+    recognition.interimResults = true;
+
+    recognition.onresult = (e) => {
+      let interim = '';
+      for(let i=e.resultIndex;i<e.results.length;i++){
+        const t = e.results[i][0].transcript;
+        if(e.results[i].isFinal) finalTranscript += t + ' ';
+        else interim += t;
+      }
+      document.getElementById('orbCaption').textContent = (finalTranscript + interim).trim();
+    };
+    recognition.onerror = () => {};
+    recognition.onend = () => {
+      if(sessionState === 'listening' && !manualStop){
+        try{ recognition.start(); }catch(e){}
+      }
+    };
+    recognition.start();
+  }
+
+  /* ---- interview flow ---- */
+  async function startInterview(){
+    document.getElementById('speakingIntro').style.display = 'none';
+    document.getElementById('speakingSession').style.display = 'block';
+    document.getElementById('speakingResultSection').style.display = 'none';
+    document.getElementById('subtitlesBox').innerHTML = '';
+    document.getElementById('subtitlesBox').style.display = 'none';
+    interviewHistory = [];
+    interviewStage = 'part1';
+    interviewTurns = 0;
+    initOrb();
+    setStatus('Tayyorlanmoqda...');
+    await setupMic();
+    await nextQuestion("Suhbatni boshlash uchun Part 1 dan birinchi savolni ber.");
+  }
+
+  const stageGuide = {
+    part1: "Hozir Part 1 bosqichi: nomzodning shaxsiy hayoti, ish/o'qishi, qiziqishlari haqida oddiy, qisqa savol bering (1 ta savol).",
+    part2: "Hozir Part 2 bosqichiga o'tish vaqti: nomzodga 'cue card' uslubidagi mavzu bering — masalan 'Describe a...' formatida, 4 ta nazorat nuqtasi bilan (1-2 daqiqalik javob uchun).",
+    part3: "Hozir Part 3 bosqichi: Part 2 mavzusiga bog'liq, mavhumroq va chuqurroq muhokama savoli bering (1 ta savol)."
+  };
+
+  function historyAsText(){
+    return interviewHistory.map(h => (h.role === 'examiner' ? 'Imtihonchi: ' : 'Nomzod: ') + h.text).join('\n');
+  }
+
+  async function nextQuestion(instruction){
+    sessionState = 'thinking';
+    setStatus('AI savol tayyorlayapti...');
+    document.getElementById('finishAnswerBtn').style.display = 'none';
+    document.getElementById('orbCaption').textContent = '';
+
+    const prompt = `Siz IELTS Speaking imtihonida AI imtihonchisiz. Faqat ingliz tilida, qisqa va tabiiy ohangda savol/ko'rsatma yozasiz — boshqa hech narsa yozmang (izoh, tushuntirish, belgilar kerak emas, faqat savol matni).
+
+Suhbat tarixi:
+${historyAsText() || '(hali boshlanmagan)'}
+
+Vazifa: ${instruction}
+Bosqich ko'rsatmasi: ${stageGuide[interviewStage] || ''}`;
+
+    try{
+      const question = await callClaude(prompt, 200);
+      interviewHistory.push({role:'examiner', text: question});
+      appendSubtitle('examiner', question);
+
+      sessionState = 'speaking';
+      setStatus('Imtihonchi gapiryapti...');
+      document.getElementById('orbCaption').textContent = question;
+
+      speakText(question, () => {
+        if(sessionState !== 'speaking') return; // session may have ended
+        sessionState = 'listening';
+        setStatus('Tinglanmoqda — gapiring');
+        document.getElementById('orbCaption').textContent = '';
+        document.getElementById('finishAnswerBtn').style.display = 'inline-block';
+        startListening();
+      });
+    }catch(err){
+      sessionState = 'idle';
+      setStatus('Xatolik yuz berdi');
+      document.getElementById('orbCaption').textContent = 'Savol olinmadi: ' + err.message + '. Qaytadan urinib ko\'ring yoki sessiyani tugating.';
+    }
+  }
+
+  async function stopListeningAndSubmit(){
+    if(sessionState !== 'listening') return;
+    manualStop = true;
+    if(recognition){ try{ recognition.stop(); }catch(e){} }
+
+    const answer = (finalTranscript || document.getElementById('orbCaption').textContent || '').trim();
+    document.getElementById('finishAnswerBtn').style.display = 'none';
+
+    if(!answer){
+      setStatus('Javob aniqlanmadi');
+      document.getElementById('orbCaption').textContent = 'Hech narsa eshitilmadi. Qaytadan gapirib ko\'ring.';
+      manualStop = false;
+      setTimeout(()=>{
+        if(sessionState === 'listening'){ startListening(); document.getElementById('finishAnswerBtn').style.display='inline-block'; setStatus('Tinglanmoqda — gapiring'); }
+      }, 800);
+      return;
+    }
+
+    interviewHistory.push({role:'user', text: answer});
+    appendSubtitle('user', answer);
+    document.getElementById('orbCaption').textContent = '';
+
+    interviewTurns++;
+
+    if(interviewStage === 'part1' && interviewTurns >= 3){
+      interviewStage = 'part2'; interviewTurns = 0;
+      await nextQuestion("Part 1 tugadi. Endi Part 2 ga o'ting.");
+    } else if(interviewStage === 'part2' && interviewTurns >= 1){
+      interviewStage = 'part3'; interviewTurns = 0;
+      await nextQuestion("Part 2 tugadi. Endi Part 3 ga o'ting.");
+    } else if(interviewStage === 'part3' && interviewTurns >= 2){
+      interviewStage = 'done';
+      await finishInterview();
+    } else {
+      await nextQuestion("Suhbatni davom ettir, navbatdagi savolni ber.");
+    }
+  }
+
+  function cleanupSession(){
+    if(recognition){ manualStop = true; try{ recognition.stop(); }catch(e){} recognition = null; }
+    if(window.speechSynthesis) speechSynthesis.cancel();
+    if(orbAnimId){ cancelAnimationFrame(orbAnimId); orbAnimId = null; }
+    if(micStream){ micStream.getTracks().forEach(t => t.stop()); micStream = null; }
+    if(audioCtx){ try{ audioCtx.close(); }catch(e){} audioCtx = null; }
+    analyser = null;
+    sessionState = 'idle';
+  }
+
+  async function endSession(){
+    const hasAnswers = interviewHistory.some(h => h.role === 'user');
+    if(hasAnswers && interviewStage !== 'done'){
+      interviewStage = 'done';
+      manualStop = true;
+      if(recognition){ try{ recognition.stop(); }catch(e){} }
+      if(window.speechSynthesis) speechSynthesis.cancel();
+      await finishInterview();
+    } else {
+      cleanupSession();
+      showView('dashboard');
+      document.getElementById('speakingIntro').style.display = 'block';
+      document.getElementById('speakingSession').style.display = 'none';
+    }
+  }
+
+  async function finishInterview(){
+    cleanupSession();
+    document.getElementById('speakingSession').style.display = 'none';
+    document.getElementById('speakingResultSection').style.display = 'block';
+    const resultArea = document.getElementById('speechResultArea');
+    resultArea.innerHTML = '<div class="result-empty"><div class="spinner"></div><p>AI butun suhbatni tahlil qilmoqda...</p></div>';
+
+    const prompt = `Siz IELTS Speaking bo'yicha rasmiy imtihon baholovchisisiz. Quyida nomzod bilan bo'lgan to'liq suhbat (Part 1, 2, 3) berilgan. Nomzodning barcha javoblari og'zaki javoblarning matnga aylantirilgan nusxasi.
+
+To'liq suhbat:
+${historyAsText()}
+
+Diqqat: bu og'zaki javoblarning matnga aylantirilgan nusxasi, shuning uchun talaffuz haqida hech qanday baho bermang — uni qoldiring. Faqat quyidagi mezonlar bo'yicha baholang: Fluency and Coherence (FC), Lexical Resource (LR), Grammatical Range and Accuracy (GRA).
+
+Javobni FAQAT quyidagi JSON formatida qaytaring, hech qanday qo'shimcha matn, izoh yoki markdown belgilarisiz:
+
+{
+  "overall": <FC, LR, GRA ning o'rtacha bandi, 0.5 qadam bilan, masalan 6.5>,
+  "fc": <Fluency and Coherence band>,
+  "lr": <Lexical Resource band>,
+  "gra": <Grammatical Range and Accuracy band>,
+  "strengths": "<kuchli tomonlar, o'zbek tilida, 2-3 gap>",
+  "improvements": "<yaxshilash kerak bo'lgan tomonlar, o'zbek tilida, 3-5 aniq tavsiya, har biri yangi qatorda '- ' bilan boshlansin>"
+}`;
+
+    try{
+      let raw = await callClaude(prompt, 1000);
+      raw = raw.replace(/```json|```/g, '').trim();
+      const result = JSON.parse(raw);
+
+      resultArea.innerHTML = `
+        <div class="band-overall">
+          <span class="big-num">${result.overall}</span>
+          <span class="label">Taxminiy band<br>(talaffuzsiz)</span>
+        </div>
+        <div class="criteria">
+          <div class="crit"><div class="crit-name">Fluency &amp; Coherence</div><div class="crit-band">${result.fc}</div></div>
+          <div class="crit"><div class="crit-name">Lexical Resource</div><div class="crit-band">${result.lr}</div></div>
+          <div class="crit"><div class="crit-name">Grammar</div><div class="crit-band">${result.gra}</div></div>
+          <div class="crit"><div class="crit-name">Pronunciation</div><div class="crit-band" style="color:#B7BFB9">—</div></div>
+        </div>
+        <div class="feedback-text">
+          <h5>Kuchli tomonlar</h5>
+          ${result.strengths}
+          <h5>Yaxshilash uchun tavsiyalar</h5>
+          ${result.improvements}
+        </div>
+        <button class="btn-secondary" style="width:100%;text-align:center;margin-top:18px" onclick="showView('speaking'); document.getElementById('speakingIntro').style.display='block'; document.getElementById('speakingResultSection').style.display='none';">Yana boshlash</button>
+      `;
+    } catch(err){
+      resultArea.innerHTML = '<div class="error-box">Xatolik yuz berdi. Iltimos, qaytadan urinib ko‘ring. (' + err.message + ')</div>';
+    }
+  }
+
+  /* =========================================================
+     INIT
+  ========================================================= */
   window.addEventListener('load', () => {
     document.querySelectorAll('.marker').forEach(m => {
       m.style.transition = 'none';
