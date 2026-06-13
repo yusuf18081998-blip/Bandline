@@ -14,6 +14,7 @@
     --sage:#4F7C6B;
     --line:#C7CCC2;
     --card:#FFFFFF;
+    --danger:#C25B4A;
   }
   *{margin:0;padding:0;box-sizing:border-box;}
   html{scroll-behavior:smooth;}
@@ -25,6 +26,8 @@
     -webkit-font-smoothing:antialiased;
   }
   .wrap{max-width:1120px;margin:0 auto;padding:0 24px;}
+  .view{display:none;}
+  .view.active{display:block;}
 
   /* NAV */
   header{
@@ -40,6 +43,7 @@
   .logo{
     font-family:'Fraunces',serif;font-weight:600;font-size:22px;
     letter-spacing:-0.02em;display:flex;align-items:center;gap:8px;
+    cursor:pointer;border:none;background:none;color:var(--ink);
   }
   .logo-mark{
     width:22px;height:22px;border-radius:4px;
@@ -47,16 +51,20 @@
     display:inline-block;
   }
   .nav-links{display:flex;gap:32px;align-items:center;}
-  .nav-links a{color:var(--ink);text-decoration:none;font-size:15px;font-weight:500;opacity:0.75;transition:opacity .2s;}
-  .nav-links a:hover{opacity:1;}
+  .nav-links a, .nav-links button.link{
+    color:var(--ink);text-decoration:none;font-size:15px;font-weight:500;opacity:0.75;transition:opacity .2s;
+    background:none;border:none;cursor:pointer;font-family:'Inter',sans-serif;
+  }
+  .nav-links a:hover, .nav-links button.link:hover{opacity:1;}
   .nav-cta{
     background:var(--ink);color:var(--paper);padding:10px 20px;
     border-radius:100px;font-weight:600;font-size:14px;text-decoration:none;
-    transition:transform .15s ease;
+    transition:transform .15s ease;border:none;cursor:pointer;font-family:'Inter',sans-serif;
   }
   .nav-cta:hover{transform:translateY(-1px);}
   @media (max-width:720px){
-    .nav-links a:not(.nav-cta){display:none;}
+    .nav-links a:not(.nav-cta):not(.link){display:none;}
+    .nav-links button.link{display:none;}
   }
 
   /* HERO */
@@ -90,18 +98,20 @@
   .btn-primary{
     background:var(--ink);color:var(--paper);padding:15px 28px;border-radius:100px;
     font-weight:600;font-size:15px;text-decoration:none;display:inline-block;
-    transition:transform .15s ease, box-shadow .15s ease;
+    transition:transform .15s ease, box-shadow .15s ease;border:none;cursor:pointer;
+    font-family:'Inter',sans-serif;
   }
   .btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(31,46,42,0.18);}
+  .btn-primary:disabled{opacity:0.6;cursor:not-allowed;transform:none;}
   .btn-secondary{
     border:1.5px solid var(--line);color:var(--ink);padding:14px 26px;border-radius:100px;
     font-weight:600;font-size:15px;text-decoration:none;display:inline-block;
-    transition:border-color .15s ease;
+    transition:border-color .15s ease;background:none;cursor:pointer;font-family:'Inter',sans-serif;
   }
   .btn-secondary:hover{border-color:var(--ink);}
   .fine-print{font-size:13px;color:#7C857E;margin-top:14px;}
 
-  /* BAND SCALE — signature element */
+  /* BAND SCALE */
   .scale-wrap{display:flex;justify-content:center;}
   .scale-card{
     background:var(--card);border:1px solid var(--line);border-radius:20px;
@@ -159,12 +169,20 @@
   .card{
     background:var(--card);border:1px solid var(--line);border-radius:16px;
     padding:26px;transition:border-color .2s ease, transform .2s ease;
+    cursor:default;
   }
-  .card:hover{border-color:#9AA29A;transform:translateY(-3px);}
+  .card.clickable{cursor:pointer;}
+  .card.clickable:hover{border-color:var(--sage);transform:translateY(-3px);}
+  .card:not(.clickable):hover{border-color:#9AA29A;transform:translateY(-3px);}
   .card .num{
     font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--gold);
-    font-weight:600;margin-bottom:14px;
+    font-weight:600;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;
   }
+  .card .num .status{
+    font-size:11px;padding:2px 8px;border-radius:100px;font-weight:600;
+  }
+  .card .num .status.ready{background:#E3EEE8;color:var(--sage);}
+  .card .num .status.soon{background:#F0EBE0;color:#A48A55;}
   .card h3{
     font-family:'Fraunces',serif;font-size:19px;font-weight:600;margin-bottom:8px;
   }
@@ -174,7 +192,6 @@
   .steps{padding:60px 0 80px;}
   .steps-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:32px;}
   @media (max-width:860px){.steps-grid{grid-template-columns:1fr;gap:40px;}}
-  .step{position:relative;padding-left:0;}
   .step-num{
     font-family:'Fraunces',serif;font-size:48px;font-weight:600;color:var(--line);
     line-height:1;margin-bottom:12px;
@@ -203,21 +220,132 @@
   }
   .foot-row a{color:#7C857E;text-decoration:none;margin-left:18px;}
   .foot-row a:hover{color:var(--ink);}
+
+  /* AUTH (signup/login) */
+  .auth-wrap{
+    min-height:60vh;display:flex;align-items:center;justify-content:center;
+    padding:60px 0;
+  }
+  .auth-card{
+    background:var(--card);border:1px solid var(--line);border-radius:20px;
+    padding:40px;width:100%;max-width:420px;
+    box-shadow:0 20px 60px -30px rgba(31,46,42,0.25);
+  }
+  .auth-card h2{
+    font-family:'Fraunces',serif;font-size:28px;font-weight:600;margin-bottom:8px;
+  }
+  .auth-card .sub{font-size:14.5px;color:#7C857E;margin-bottom:28px;}
+  .field{margin-bottom:18px;}
+  .field label{
+    display:block;font-size:13px;font-weight:600;margin-bottom:6px;color:#445049;
+  }
+  .field input{
+    width:100%;padding:12px 14px;border:1.5px solid var(--line);border-radius:10px;
+    font-family:'Inter',sans-serif;font-size:15px;background:var(--paper);
+    transition:border-color .15s ease;
+  }
+  .field input:focus{outline:none;border-color:var(--sage);}
+  .auth-card .btn-primary{width:100%;text-align:center;margin-top:6px;}
+  .auth-switch{text-align:center;margin-top:20px;font-size:14px;color:#7C857E;}
+  .auth-switch button{
+    background:none;border:none;color:var(--sage);font-weight:600;cursor:pointer;
+    font-family:'Inter',sans-serif;font-size:14px;text-decoration:underline;
+  }
+
+  /* DASHBOARD */
+  .dash-head{padding:48px 0 8px;}
+  .dash-head .eyebrow{margin-bottom:10px;}
+  .dash-head h2{
+    font-family:'Fraunces',serif;font-size:clamp(26px,4vw,36px);font-weight:600;
+    margin-bottom:4px;
+  }
+  .dash-head p{color:#7C857E;font-size:15px;margin-bottom:36px;}
+  .dash-grid{padding-bottom:80px;}
+
+  /* WRITING TOOL */
+  .tool-head{padding:40px 0 8px;display:flex;align-items:center;gap:14px;}
+  .back-btn{
+    background:var(--card);border:1px solid var(--line);border-radius:100px;
+    width:40px;height:40px;display:flex;align-items:center;justify-content:center;
+    cursor:pointer;font-size:18px;transition:border-color .15s ease;flex-shrink:0;
+  }
+  .back-btn:hover{border-color:var(--sage);}
+  .tool-head h2{
+    font-family:'Fraunces',serif;font-size:clamp(24px,4vw,32px);font-weight:600;
+  }
+  .tool-grid{
+    display:grid;grid-template-columns:1fr 1fr;gap:24px;padding:32px 0 80px;
+  }
+  @media (max-width:860px){.tool-grid{grid-template-columns:1fr;}}
+  .tool-panel{
+    background:var(--card);border:1px solid var(--line);border-radius:16px;padding:24px;
+  }
+  .tool-panel h4{
+    font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;
+    text-transform:uppercase;letter-spacing:0.08em;color:#7C857E;margin-bottom:14px;
+  }
+  .seg{display:flex;gap:8px;margin-bottom:16px;}
+  .seg button{
+    flex:1;padding:10px;border:1.5px solid var(--line);border-radius:10px;background:var(--paper);
+    font-family:'Inter',sans-serif;font-size:13.5px;font-weight:600;cursor:pointer;
+    transition:all .15s ease;color:var(--ink);
+  }
+  .seg button.active{background:var(--ink);color:var(--paper);border-color:var(--ink);}
+  textarea{
+    width:100%;min-height:260px;padding:14px;border:1.5px solid var(--line);border-radius:10px;
+    font-family:'Inter',sans-serif;font-size:14.5px;resize:vertical;background:var(--paper);
+    line-height:1.6;
+  }
+  textarea:focus{outline:none;border-color:var(--sage);}
+  .word-count{font-size:12.5px;color:#9AA29A;margin-top:8px;text-align:right;}
+  .result-empty{
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    min-height:300px;text-align:center;color:#9AA29A;
+  }
+  .result-empty .big{font-size:40px;margin-bottom:14px;}
+  .result-empty p{font-size:14px;max-width:240px;}
+  .band-overall{
+    display:flex;align-items:baseline;gap:10px;margin-bottom:20px;padding-bottom:20px;
+    border-bottom:1px solid var(--line);
+  }
+  .band-overall .big-num{
+    font-family:'Fraunces',serif;font-size:48px;font-weight:600;color:var(--sage);
+  }
+  .band-overall .label{font-size:14px;color:#7C857E;}
+  .criteria{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:20px;}
+  .crit{background:var(--paper);border-radius:10px;padding:12px;}
+  .crit .crit-name{font-size:11.5px;color:#7C857E;font-weight:600;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px;}
+  .crit .crit-band{font-family:'IBM Plex Mono',monospace;font-size:22px;font-weight:600;}
+  .feedback-text{font-size:14.5px;color:#3A453F;white-space:pre-wrap;line-height:1.7;}
+  .feedback-text h5{font-size:13px;text-transform:uppercase;letter-spacing:0.06em;color:var(--gold);font-weight:700;margin:16px 0 6px;}
+  .feedback-text h5:first-child{margin-top:0;}
+  .spinner{
+    width:32px;height:32px;border:3px solid var(--line);border-top-color:var(--sage);
+    border-radius:50%;animation:spin 0.8s linear infinite;margin-bottom:14px;
+  }
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .error-box{
+    background:#FBEEEB;border:1px solid #E8C4BB;border-radius:10px;padding:14px;
+    color:var(--danger);font-size:14px;margin-top:14px;
+  }
 </style>
 </head>
 <body>
 
 <header>
   <nav>
-    <div class="logo"><span class="logo-mark"></span>Bandline</div>
+    <button class="logo" onclick="showView('landing')"><span class="logo-mark"></span>Bandline</button>
     <div class="nav-links">
-      <a href="#features">Imkoniyatlar</a>
-      <a href="#how">Qanday ishlaydi</a>
-      <a href="#start" class="nav-cta">Bepul boshlash</a>
+      <a href="#features" onclick="showView('landing')">Imkoniyatlar</a>
+      <a href="#how" onclick="showView('landing')">Qanday ishlaydi</a>
+      <button class="link" id="navDashBtn" style="display:none" onclick="showView('dashboard')">Dashboard</button>
+      <button class="nav-cta" id="navCta" onclick="showView('signup')">Bepul boshlash</button>
     </div>
   </nav>
 </header>
 
+<!-- ===================== LANDING ===================== -->
+<div class="view active" id="view-landing">
 <main class="wrap">
 
   <section class="hero">
@@ -229,7 +357,7 @@
         maqsadli balingizga qadar bosqichma-bosqich reja — barchasi bepul.
       </p>
       <div class="cta-row">
-        <a href="#start" class="btn-primary">Bepul boshlash</a>
+        <button class="btn-primary" onclick="showView('signup')">Bepul boshlash</button>
         <a href="#how" class="btn-secondary">Qanday ishlaydi</a>
       </div>
       <p class="fine-print">Karta kerak emas · Ro‘yxatdan o‘tish 1 daqiqa</p>
@@ -249,11 +377,11 @@
           <div class="tick"><span class="tick-label">2</span></div>
           <div class="tick"><span class="tick-label">1</span></div>
 
-          <div class="marker current">
+          <div class="marker current" id="markerCurrent">
             <span class="pill">Hozir · 5.5</span>
             <span class="dot"></span>
           </div>
-          <div class="marker target">
+          <div class="marker target" id="markerTarget">
             <span class="pill">Maqsad · 7.0</span>
             <span class="dot"></span>
           </div>
@@ -273,32 +401,32 @@
     </div>
     <div class="grid">
       <div class="card">
-        <div class="num">01</div>
+        <div class="num">01 <span class="status ready">Ishlaydi</span></div>
         <h3>Writing baholovchi</h3>
         <p>Task 1 va Task 2 insholaringizni yuklang — AI har bir mezon (TR, CC, LR, GRA) bo‘yicha band va aniq tavsiyalar beradi.</p>
       </div>
       <div class="card">
-        <div class="num">02</div>
+        <div class="num">02 <span class="status soon">Tez kunda</span></div>
         <h3>Speaking simulyatori</h3>
         <p>Ovozli javoblaringizni yozib oling. AI talaffuz, ravonlik va lug‘at boyligi bo‘yicha darhol fikr bildiradi.</p>
       </div>
       <div class="card">
-        <div class="num">03</div>
+        <div class="num">03 <span class="status soon">Tez kunda</span></div>
         <h3>Cheksiz mock testlar</h3>
         <p>Listening va Reading bo‘limlari uchun real formatdagi testlar — istalgancha urinish, avtomatik baholash.</p>
       </div>
       <div class="card">
-        <div class="num">04</div>
+        <div class="num">04 <span class="status soon">Tez kunda</span></div>
         <h3>Shaxsiy reja</h3>
         <p>Hozirgi va maqsad balingiz asosida har kunlik vazifalar tuziladi — nimani qachon o‘rganishni o‘ylamang.</p>
       </div>
       <div class="card">
-        <div class="num">05</div>
+        <div class="num">05 <span class="status soon">Tez kunda</span></div>
         <h3>Lug‘at to‘plami</h3>
         <p>Xatolaringizdan avtomatik flashcardlar yaratiladi — takrorlash orqali eslab qolish kuchaytiriladi.</p>
       </div>
       <div class="card">
-        <div class="num">06</div>
+        <div class="num">06 <span class="status soon">Tez kunda</span></div>
         <h3>Progress statistikasi</h3>
         <p>Har bir bo‘lim bo‘yicha o‘sish grafigi — qaysi ko‘nikma sustligini aniq ko‘ring.</p>
       </div>
@@ -313,18 +441,18 @@
     <div class="steps-grid">
       <div class="step">
         <div class="step-num">01</div>
-        <h4>Diagnostik testdan o‘ting</h4>
-        <p>10 daqiqalik qisqa test orqali hozirgi darajangiz aniqlanadi.</p>
+        <h4>Ro‘yxatdan o‘ting</h4>
+        <p>Email va parol bilan 1 daqiqada hisob yarating — karta talab qilinmaydi.</p>
       </div>
       <div class="step">
         <div class="step-num">02</div>
-        <h4>AI fikr-mulohazasini oling</h4>
-        <p>Writing va Speaking javoblaringiz bo‘yicha batafsil, mezon asosidagi tahlil.</p>
+        <h4>Inshongizni yuboring</h4>
+        <p>Writing Task 1 yoki Task 2 javobingizni joylashtiring.</p>
       </div>
       <div class="step">
         <div class="step-num">03</div>
-        <h4>Rejaga amal qiling</h4>
-        <p>Kunlik vazifalar avtomatik yangilanadi — progress sizning natijalaringizga moslashadi.</p>
+        <h4>AI bahosini oling</h4>
+        <p>Mezon bo‘yicha band va aniq tavsiyalar bilan batafsil tahlil — soniyalar ichida.</p>
       </div>
     </div>
   </section>
@@ -332,11 +460,118 @@
   <section class="cta-band" id="start">
     <h2>Bugun boshlang — birinchi baho bepul.</h2>
     <p>700+ talaba allaqachon o‘z bandini oshirdi. Karta kerak emas.</p>
-    <a href="#" class="btn-primary">Bepul ro‘yxatdan o‘tish</a>
+    <button class="btn-primary" onclick="showView('signup')">Bepul ro‘yxatdan o‘tish</button>
   </section>
 
 </main>
+</div>
 
+<!-- ===================== SIGNUP ===================== -->
+<div class="view" id="view-signup">
+<main class="wrap">
+  <div class="auth-wrap">
+    <div class="auth-card">
+      <h2 id="authTitle">Ro‘yxatdan o‘tish</h2>
+      <p class="sub" id="authSub">Bepul — karta kerak emas. Bir necha soniya ichida boshlaysiz.</p>
+      <form id="authForm" onsubmit="handleAuth(event)">
+        <div class="field" id="nameField">
+          <label for="authName">Ism</label>
+          <input type="text" id="authName" placeholder="Ismingiz">
+        </div>
+        <div class="field">
+          <label for="authEmail">Email</label>
+          <input type="email" id="authEmail" placeholder="email@misol.com" required>
+        </div>
+        <div class="field">
+          <label for="authPass">Parol</label>
+          <input type="password" id="authPass" placeholder="••••••••" required minlength="4">
+        </div>
+        <button type="submit" class="btn-primary" id="authSubmit">Bepul boshlash</button>
+      </form>
+      <div class="auth-switch" id="authSwitch">
+        Hisobingiz bormi? <button onclick="toggleAuthMode()">Kirish</button>
+      </div>
+    </div>
+  </div>
+</main>
+</div>
+
+<!-- ===================== DASHBOARD ===================== -->
+<div class="view" id="view-dashboard">
+<main class="wrap">
+  <section class="dash-head">
+    <div class="eyebrow">Dashboard</div>
+    <h2 id="dashGreeting">Xush kelibsiz!</h2>
+    <p>Maqsad balingiz <strong style="color:var(--ink)">7.0</strong> — quyidagi vositalardan birini tanlang.</p>
+  </section>
+  <section class="grid dash-grid">
+    <div class="card clickable" onclick="showView('writing')">
+      <div class="num">01 <span class="status ready">Ishlaydi</span></div>
+      <h3>Writing baholovchi</h3>
+      <p>Insho yuboring va AI mezon bo‘yicha (TR, CC, LR, GRA) band va tavsiyalar beradi.</p>
+    </div>
+    <div class="card">
+      <div class="num">02 <span class="status soon">Tez kunda</span></div>
+      <h3>Speaking simulyatori</h3>
+      <p>Ovozli javob yozib olish va AI tahlili.</p>
+    </div>
+    <div class="card">
+      <div class="num">03 <span class="status soon">Tez kunda</span></div>
+      <h3>Mock testlar</h3>
+      <p>Listening va Reading — real formatda.</p>
+    </div>
+    <div class="card">
+      <div class="num">04 <span class="status soon">Tez kunda</span></div>
+      <h3>Shaxsiy reja</h3>
+      <p>Kunlik vazifalar maqsad balingiz asosida.</p>
+    </div>
+    <div class="card">
+      <div class="num">05 <span class="status soon">Tez kunda</span></div>
+      <h3>Lug‘at to‘plami</h3>
+      <p>Xatolardan avtomatik flashcardlar.</p>
+    </div>
+    <div class="card">
+      <div class="num">06 <span class="status soon">Tez kunda</span></div>
+      <h3>Progress statistikasi</h3>
+      <p>Bo‘limlar bo‘yicha o‘sish grafigi.</p>
+    </div>
+  </section>
+</main>
+</div>
+
+<!-- ===================== WRITING TOOL ===================== -->
+<div class="view" id="view-writing">
+<main class="wrap">
+  <section class="tool-head">
+    <button class="back-btn" onclick="showView('dashboard')">←</button>
+    <h2>Writing baholovchi</h2>
+  </section>
+  <section class="tool-grid">
+    <div class="tool-panel">
+      <h4>Insho matni</h4>
+      <div class="seg">
+        <button class="active" onclick="setTask(1, event)">Task 1</button>
+        <button onclick="setTask(2, event)">Task 2</button>
+      </div>
+      <textarea id="essayInput" placeholder="Insho matnini shu yerga joylashtiring..."></textarea>
+      <div class="word-count" id="wordCount">0 so‘z</div>
+      <button class="btn-primary" style="margin-top:16px;width:100%;text-align:center" id="evalBtn" onclick="evaluateEssay()">Baholash</button>
+    </div>
+    <div class="tool-panel">
+      <h4>AI fikr-mulohazasi</h4>
+      <div id="resultArea">
+        <div class="result-empty">
+          <div class="big">✍️</div>
+          <p>Insho matnini kiriting va "Baholash" tugmasini bosing — AI band va tavsiyalarni shu yerda ko‘rsatadi.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+</div>
+
+<!-- ===================== FOOTER (always visible on landing) ===================== -->
+<div class="view active" id="view-footer">
 <footer>
   <div class="wrap foot-row">
     <span>© 2026 Bandline. IELTS® — British Council, IDP va Cambridge Assessment English ro‘yxatdan o‘tgan savdo belgisi. Bandline ular bilan bog‘liq emas.</span>
@@ -346,12 +581,139 @@
     </div>
   </div>
 </footer>
+</div>
 
 <script>
-  // animate markers in on load
+  let isLoginMode = false;
+  let currentTask = 1;
+  let userName = '';
+
+  function showView(name){
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.getElementById('view-' + name).classList.add('active');
+    document.getElementById('view-footer').classList.toggle('active', name === 'landing');
+    window.scrollTo({top:0, behavior:'smooth'});
+
+    // nav state
+    const navCta = document.getElementById('navCta');
+    const navDash = document.getElementById('navDashBtn');
+    if(name === 'dashboard' || name === 'writing'){
+      navCta.textContent = 'Chiqish';
+      navCta.onclick = () => { showView('landing'); navDash.style.display='none'; navCta.textContent='Bepul boshlash'; navCta.onclick=()=>showView('signup'); };
+      navDash.style.display = 'inline-block';
+    }
+  }
+
+  function toggleAuthMode(){
+    isLoginMode = !isLoginMode;
+    document.getElementById('authTitle').textContent = isLoginMode ? 'Kirish' : 'Ro‘yxatdan o‘tish';
+    document.getElementById('authSub').textContent = isLoginMode ? 'Hisobingizga kiring.' : 'Bepul — karta kerak emas. Bir necha soniya ichida boshlaysiz.';
+    document.getElementById('authSubmit').textContent = isLoginMode ? 'Kirish' : 'Bepul boshlash';
+    document.getElementById('nameField').style.display = isLoginMode ? 'none' : 'block';
+    document.getElementById('authSwitch').innerHTML = isLoginMode
+      ? 'Hisobingiz yo‘qmi? <button onclick="toggleAuthMode()">Ro‘yxatdan o‘tish</button>'
+      : 'Hisobingiz bormi? <button onclick="toggleAuthMode()">Kirish</button>';
+  }
+
+  function handleAuth(e){
+    e.preventDefault();
+    const nameVal = document.getElementById('authName').value.trim();
+    userName = nameVal || document.getElementById('authEmail').value.split('@')[0] || 'Talaba';
+    document.getElementById('dashGreeting').textContent = 'Xush kelibsiz, ' + userName + '!';
+    showView('dashboard');
+  }
+
+  function setTask(n, e){
+    currentTask = n;
+    document.querySelectorAll('.seg button').forEach(b => b.classList.remove('active'));
+    e.target.classList.add('active');
+  }
+
+  document.addEventListener('input', (e) => {
+    if(e.target.id === 'essayInput'){
+      const words = e.target.value.trim().split(/\s+/).filter(Boolean).length;
+      document.getElementById('wordCount').textContent = words + ' so‘z';
+    }
+  });
+
+  async function evaluateEssay(){
+    const essay = document.getElementById('essayInput').value.trim();
+    const resultArea = document.getElementById('resultArea');
+    const btn = document.getElementById('evalBtn');
+
+    if(essay.split(/\s+/).filter(Boolean).length < 20){
+      resultArea.innerHTML = '<div class="error-box">Iltimos, kamida 20 so‘zdan iborat insho kiriting.</div>';
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'Baholanmoqda...';
+    resultArea.innerHTML = '<div class="result-empty"><div class="spinner"></div><p>AI insho matnini tahlil qilmoqda — bu bir necha soniya vaqt oladi.</p></div>';
+
+    const prompt = `Siz IELTS Writing Task ${currentTask} bo'yicha rasmiy imtihon baholovchisisiz. Quyidagi insho matnini IELTS rasmik mezonlari asosida baholang: Task Response (TR), Coherence and Cohesion (CC), Lexical Resource (LR), Grammatical Range and Accuracy (GRA).
+
+Insho matni:
+"""
+${essay}
+"""
+
+Javobni FAQAT quyidagi JSON formatida qaytaring, hech qanday qo'shimcha matn, izoh yoki markdown belgilarisiz:
+
+{
+  "overall": <umumiy band, 0.5 qadam bilan, masalan 6.5>,
+  "tr": <Task Response band>,
+  "cc": <Coherence and Cohesion band>,
+  "lr": <Lexical Resource band>,
+  "gra": <Grammatical Range and Accuracy band>,
+  "strengths": "<kuchli tomonlar, o'zbek tilida, 2-3 gap>",
+  "improvements": "<yaxshilash kerak bo'lgan tomonlar, o'zbek tilida, 3-5 aniq tavsiya, har biri yangi qatorda '- ' bilan boshlansin>"
+}`;
+
+    try{
+      const response = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model: "claude-sonnet-4-6",
+          max_tokens: 1000,
+          messages: [{ role: "user", content: prompt }]
+        })
+      });
+
+      const data = await response.json();
+      const textBlock = data.content.find(c => c.type === 'text');
+      let raw = textBlock.text.trim();
+      raw = raw.replace(/```json|```/g, '').trim();
+      const result = JSON.parse(raw);
+
+      resultArea.innerHTML = `
+        <div class="band-overall">
+          <span class="big-num">${result.overall}</span>
+          <span class="label">Umumiy band<br>(Task ${currentTask})</span>
+        </div>
+        <div class="criteria">
+          <div class="crit"><div class="crit-name">Task Response</div><div class="crit-band">${result.tr}</div></div>
+          <div class="crit"><div class="crit-name">Coherence &amp; Cohesion</div><div class="crit-band">${result.cc}</div></div>
+          <div class="crit"><div class="crit-name">Lexical Resource</div><div class="crit-band">${result.lr}</div></div>
+          <div class="crit"><div class="crit-name">Grammar</div><div class="crit-band">${result.gra}</div></div>
+        </div>
+        <div class="feedback-text">
+          <h5>Kuchli tomonlar</h5>
+          ${result.strengths}
+          <h5>Yaxshilash uchun tavsiyalar</h5>
+          ${result.improvements}
+        </div>
+      `;
+    } catch(err){
+      resultArea.innerHTML = '<div class="error-box">Xatolik yuz berdi. Iltimos, qaytadan urinib ko‘ring. (' + err.message + ')</div>';
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Baholash';
+    }
+  }
+
   window.addEventListener('load', () => {
     document.querySelectorAll('.marker').forEach(m => {
-      const target = m.style.bottom || getComputedStyle(m).bottom;
       m.style.transition = 'none';
       m.style.bottom = '0%';
       requestAnimationFrame(() => {
