@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bandline — IELTS tayyorlash AI bilan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#EDEFE8;
+    --ink:#1F2E2A;
+    --gold:#D9A23B;
+    --sage:#4F7C6B;
+    --line:#C7CCC2;
+    --card:#FFFFFF;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    font-family:'Inter',sans-serif;
+    background:var(--paper);
+    color:var(--ink);
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1120px;margin:0 auto;padding:0 24px;}
+
+  /* NAV */
+  header{
+    position:sticky;top:0;z-index:50;
+    background:rgba(237,239,232,0.85);
+    backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--line);
+  }
+  nav{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:18px 24px;max-width:1120px;margin:0 auto;
+  }
+  .logo{
+    font-family:'Fraunces',serif;font-weight:600;font-size:22px;
+    letter-spacing:-0.02em;display:flex;align-items:center;gap:8px;
+  }
+  .logo-mark{
+    width:22px;height:22px;border-radius:4px;
+    background:linear-gradient(180deg,var(--gold) 0%, var(--sage) 100%);
+    display:inline-block;
+  }
+  .nav-links{display:flex;gap:32px;align-items:center;}
+  .nav-links a{color:var(--ink);text-decoration:none;font-size:15px;font-weight:500;opacity:0.75;transition:opacity .2s;}
+  .nav-links a:hover{opacity:1;}
+  .nav-cta{
+    background:var(--ink);color:var(--paper);padding:10px 20px;
+    border-radius:100px;font-weight:600;font-size:14px;text-decoration:none;
+    transition:transform .15s ease;
+  }
+  .nav-cta:hover{transform:translateY(-1px);}
+  @media (max-width:720px){
+    .nav-links a:not(.nav-cta){display:none;}
+  }
+
+  /* HERO */
+  .hero{
+    padding:80px 0 60px;
+    display:grid;grid-template-columns:1.1fr 0.9fr;gap:60px;align-items:center;
+  }
+  @media (max-width:860px){
+    .hero{grid-template-columns:1fr;padding:48px 0 40px;gap:48px;}
+  }
+  .eyebrow{
+    font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:600;
+    letter-spacing:0.12em;text-transform:uppercase;color:var(--sage);
+    display:flex;align-items:center;gap:10px;margin-bottom:20px;
+  }
+  .eyebrow::before{content:'';width:28px;height:1px;background:var(--sage);}
+  h1{
+    font-family:'Fraunces',serif;font-weight:600;
+    font-size:clamp(36px,6vw,58px);line-height:1.05;letter-spacing:-0.02em;
+    margin-bottom:22px;
+  }
+  h1 em{
+    font-style:italic;font-weight:500;
+    background:linear-gradient(90deg,var(--sage),var(--gold));
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  .hero p.lead{
+    font-size:18px;color:#445049;max-width:480px;margin-bottom:32px;
+  }
+  .cta-row{display:flex;gap:14px;flex-wrap:wrap;}
+  .btn-primary{
+    background:var(--ink);color:var(--paper);padding:15px 28px;border-radius:100px;
+    font-weight:600;font-size:15px;text-decoration:none;display:inline-block;
+    transition:transform .15s ease, box-shadow .15s ease;
+  }
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(31,46,42,0.18);}
+  .btn-secondary{
+    border:1.5px solid var(--line);color:var(--ink);padding:14px 26px;border-radius:100px;
+    font-weight:600;font-size:15px;text-decoration:none;display:inline-block;
+    transition:border-color .15s ease;
+  }
+  .btn-secondary:hover{border-color:var(--ink);}
+  .fine-print{font-size:13px;color:#7C857E;margin-top:14px;}
+
+  /* BAND SCALE — signature element */
+  .scale-wrap{display:flex;justify-content:center;}
+  .scale-card{
+    background:var(--card);border:1px solid var(--line);border-radius:20px;
+    padding:28px 28px 24px;width:100%;max-width:340px;
+    box-shadow:0 20px 60px -30px rgba(31,46,42,0.35);
+  }
+  .scale-card h3{
+    font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;
+    text-transform:uppercase;letter-spacing:0.1em;color:#7C857E;margin-bottom:18px;
+  }
+  .scale{
+    position:relative;height:240px;display:flex;flex-direction:column-reverse;
+    border-left:2px solid var(--line);padding-left:18px;
+  }
+  .tick{
+    flex:1;position:relative;display:flex;align-items:center;border-top:1px solid #E2E5DC;
+  }
+  .tick:first-child{border-top:none;}
+  .tick-label{
+    font-family:'IBM Plex Mono',monospace;font-size:12px;color:#9AA29A;
+    position:absolute;left:-32px;transform:translateY(-50%);top:0;
+  }
+  .marker{
+    position:absolute;left:0;right:0;display:flex;justify-content:flex-end;
+    align-items:center;gap:8px;transition:bottom 1.4s cubic-bezier(.22,1,.36,1);
+  }
+  .marker .pill{
+    font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:13px;
+    padding:4px 10px;border-radius:100px;color:#fff;white-space:nowrap;
+  }
+  .marker.current{bottom:38%;}
+  .marker.target{bottom:78%;}
+  .marker.current .pill{background:var(--sage);}
+  .marker.target .pill{background:var(--gold);}
+  .marker .dot{width:10px;height:10px;border-radius:50%;background:inherit;}
+  .marker.current .dot{background:var(--sage);}
+  .marker.target .dot{background:var(--gold);}
+  .scale-foot{
+    display:flex;justify-content:space-between;margin-top:18px;padding-top:18px;
+    border-top:1px solid var(--line);font-size:13px;color:#7C857E;
+  }
+  .scale-foot strong{color:var(--ink);font-family:'IBM Plex Mono',monospace;}
+
+  /* FEATURES */
+  .features{padding:70px 0;}
+  .section-head{max-width:560px;margin-bottom:48px;}
+  .section-head .eyebrow{margin-bottom:14px;}
+  .section-head h2{
+    font-family:'Fraunces',serif;font-weight:600;font-size:clamp(28px,4vw,38px);
+    letter-spacing:-0.01em;
+  }
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
+  @media (max-width:860px){.grid{grid-template-columns:repeat(2,1fr);}}
+  @media (max-width:560px){.grid{grid-template-columns:1fr;}}
+  .card{
+    background:var(--card);border:1px solid var(--line);border-radius:16px;
+    padding:26px;transition:border-color .2s ease, transform .2s ease;
+  }
+  .card:hover{border-color:#9AA29A;transform:translateY(-3px);}
+  .card .num{
+    font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--gold);
+    font-weight:600;margin-bottom:14px;
+  }
+  .card h3{
+    font-family:'Fraunces',serif;font-size:19px;font-weight:600;margin-bottom:8px;
+  }
+  .card p{font-size:14.5px;color:#5C665F;}
+
+  /* STEPS */
+  .steps{padding:60px 0 80px;}
+  .steps-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:32px;}
+  @media (max-width:860px){.steps-grid{grid-template-columns:1fr;gap:40px;}}
+  .step{position:relative;padding-left:0;}
+  .step-num{
+    font-family:'Fraunces',serif;font-size:48px;font-weight:600;color:var(--line);
+    line-height:1;margin-bottom:12px;
+  }
+  .step h4{font-size:18px;font-weight:600;margin-bottom:8px;}
+  .step p{font-size:14.5px;color:#5C665F;}
+
+  /* CTA BAND */
+  .cta-band{
+    background:var(--ink);color:var(--paper);border-radius:24px;
+    padding:56px 40px;margin:0 0 80px;text-align:center;
+  }
+  .cta-band h2{
+    font-family:'Fraunces',serif;font-weight:600;font-size:clamp(26px,4vw,36px);
+    margin-bottom:14px;letter-spacing:-0.01em;
+  }
+  .cta-band p{color:#B9C2BB;margin-bottom:28px;font-size:16px;}
+  .cta-band .btn-primary{background:var(--gold);color:var(--ink);}
+  .cta-band .btn-primary:hover{box-shadow:0 8px 24px rgba(217,162,59,0.35);}
+
+  /* FOOTER */
+  footer{border-top:1px solid var(--line);padding:32px 0;}
+  .foot-row{
+    display:flex;justify-content:space-between;align-items:center;
+    font-size:13px;color:#7C857E;flex-wrap:wrap;gap:12px;
+  }
+  .foot-row a{color:#7C857E;text-decoration:none;margin-left:18px;}
+  .foot-row a:hover{color:var(--ink);}
+</style>
+</head>
+<body>
+
+<header>
+  <nav>
+    <div class="logo"><span class="logo-mark"></span>Bandline</div>
+    <div class="nav-links">
+      <a href="#features">Imkoniyatlar</a>
+      <a href="#how">Qanday ishlaydi</a>
+      <a href="#start" class="nav-cta">Bepul boshlash</a>
+    </div>
+  </nav>
+</header>
+
+<main class="wrap">
+
+  <section class="hero">
+    <div>
+      <div class="eyebrow">AI · IELTS · Bepul</div>
+      <h1>O‘z balingizni <em>imtihondan oldin</em> bilib oling.</h1>
+      <p class="lead">
+        Writing va Speaking uchun AI baholash, cheksiz mock testlar va
+        maqsadli balingizga qadar bosqichma-bosqich reja — barchasi bepul.
+      </p>
+      <div class="cta-row">
+        <a href="#start" class="btn-primary">Bepul boshlash</a>
+        <a href="#how" class="btn-secondary">Qanday ishlaydi</a>
+      </div>
+      <p class="fine-print">Karta kerak emas · Ro‘yxatdan o‘tish 1 daqiqa</p>
+    </div>
+
+    <div class="scale-wrap">
+      <div class="scale-card">
+        <h3>Sizning band ko‘rsatkichingiz</h3>
+        <div class="scale">
+          <div class="tick"><span class="tick-label">9</span></div>
+          <div class="tick"><span class="tick-label">8</span></div>
+          <div class="tick"><span class="tick-label">7</span></div>
+          <div class="tick"><span class="tick-label">6</span></div>
+          <div class="tick"><span class="tick-label">5</span></div>
+          <div class="tick"><span class="tick-label">4</span></div>
+          <div class="tick"><span class="tick-label">3</span></div>
+          <div class="tick"><span class="tick-label">2</span></div>
+          <div class="tick"><span class="tick-label">1</span></div>
+
+          <div class="marker current">
+            <span class="pill">Hozir · 5.5</span>
+            <span class="dot"></span>
+          </div>
+          <div class="marker target">
+            <span class="pill">Maqsad · 7.0</span>
+            <span class="dot"></span>
+          </div>
+        </div>
+        <div class="scale-foot">
+          <span>Taxminiy AI baho</span>
+          <span><strong>6 hafta</strong> rejada</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="features" id="features">
+    <div class="section-head">
+      <div class="eyebrow">Vositalar</div>
+      <h2>Imtihon uchun kerakli hammasi, bir joyda.</h2>
+    </div>
+    <div class="grid">
+      <div class="card">
+        <div class="num">01</div>
+        <h3>Writing baholovchi</h3>
+        <p>Task 1 va Task 2 insholaringizni yuklang — AI har bir mezon (TR, CC, LR, GRA) bo‘yicha band va aniq tavsiyalar beradi.</p>
+      </div>
+      <div class="card">
+        <div class="num">02</div>
+        <h3>Speaking simulyatori</h3>
+        <p>Ovozli javoblaringizni yozib oling. AI talaffuz, ravonlik va lug‘at boyligi bo‘yicha darhol fikr bildiradi.</p>
+      </div>
+      <div class="card">
+        <div class="num">03</div>
+        <h3>Cheksiz mock testlar</h3>
+        <p>Listening va Reading bo‘limlari uchun real formatdagi testlar — istalgancha urinish, avtomatik baholash.</p>
+      </div>
+      <div class="card">
+        <div class="num">04</div>
+        <h3>Shaxsiy reja</h3>
+        <p>Hozirgi va maqsad balingiz asosida har kunlik vazifalar tuziladi — nimani qachon o‘rganishni o‘ylamang.</p>
+      </div>
+      <div class="card">
+        <div class="num">05</div>
+        <h3>Lug‘at to‘plami</h3>
+        <p>Xatolaringizdan avtomatik flashcardlar yaratiladi — takrorlash orqali eslab qolish kuchaytiriladi.</p>
+      </div>
+      <div class="card">
+        <div class="num">06</div>
+        <h3>Progress statistikasi</h3>
+        <p>Har bir bo‘lim bo‘yicha o‘sish grafigi — qaysi ko‘nikma sustligini aniq ko‘ring.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="steps" id="how">
+    <div class="section-head">
+      <div class="eyebrow">Jarayon</div>
+      <h2>Uch qadamda — tayyorgarlik avtomatik boshlanadi.</h2>
+    </div>
+    <div class="steps-grid">
+      <div class="step">
+        <div class="step-num">01</div>
+        <h4>Diagnostik testdan o‘ting</h4>
+        <p>10 daqiqalik qisqa test orqali hozirgi darajangiz aniqlanadi.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">02</div>
+        <h4>AI fikr-mulohazasini oling</h4>
+        <p>Writing va Speaking javoblaringiz bo‘yicha batafsil, mezon asosidagi tahlil.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">03</div>
+        <h4>Rejaga amal qiling</h4>
+        <p>Kunlik vazifalar avtomatik yangilanadi — progress sizning natijalaringizga moslashadi.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta-band" id="start">
+    <h2>Bugun boshlang — birinchi baho bepul.</h2>
+    <p>700+ talaba allaqachon o‘z bandini oshirdi. Karta kerak emas.</p>
+    <a href="#" class="btn-primary">Bepul ro‘yxatdan o‘tish</a>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap foot-row">
+    <span>© 2026 Bandline. IELTS® — British Council, IDP va Cambridge Assessment English ro‘yxatdan o‘tgan savdo belgisi. Bandline ular bilan bog‘liq emas.</span>
+    <div>
+      <a href="#">Shartlar</a>
+      <a href="#">Maxfiylik</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // animate markers in on load
+  window.addEventListener('load', () => {
+    document.querySelectorAll('.marker').forEach(m => {
+      const target = m.style.bottom || getComputedStyle(m).bottom;
+      m.style.transition = 'none';
+      m.style.bottom = '0%';
+      requestAnimationFrame(() => {
+        m.style.transition = 'bottom 1.4s cubic-bezier(.22,1,.36,1)';
+        m.style.bottom = m.classList.contains('current') ? '38%' : '78%';
+      });
+    });
+  });
+</script>
+
+</body>
+</html>
